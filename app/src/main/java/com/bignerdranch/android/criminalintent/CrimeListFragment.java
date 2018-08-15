@@ -1,5 +1,6 @@
 package com.bignerdranch.android.criminalintent;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -7,10 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -33,22 +32,31 @@ public class CrimeListFragment extends Fragment {
 
         updateUI();
         return v;
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
     }
 
     private void updateUI() {
         CrimeLab mCrimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = mCrimeLab.getCrimes();
 
-        mCrimeAdapter = new CrimeAdapter(crimes);
-        mCrimeRecyclerView.setAdapter(mCrimeAdapter);
-
+        if (mCrimeAdapter == null) {
+            mCrimeAdapter = new CrimeAdapter(crimes);
+            mCrimeRecyclerView.setAdapter(mCrimeAdapter);
+        } else {
+            mCrimeAdapter.notifyDataSetChanged();
+        }
     }
 
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView mCrimeTitleText;
         private TextView mCrimeDateText;
+        private ImageView mCrimeSolvedImage;
 
         private Crime mCrime;
 
@@ -58,6 +66,7 @@ public class CrimeListFragment extends Fragment {
 
             mCrimeTitleText.setText(mCrime.getTitle());
             mCrimeDateText.setText(mCrime.getDate().toString());
+            mCrimeSolvedImage.setVisibility(mCrime.isSolved() ? View.VISIBLE : View.GONE);
         }
 
         public CrimeHolder(LayoutInflater inflater, ViewGroup parent) {
@@ -65,14 +74,15 @@ public class CrimeListFragment extends Fragment {
 
             mCrimeTitleText = (TextView) itemView.findViewById(R.id.crime_title);
             mCrimeDateText = (TextView) itemView.findViewById(R.id.crime_date);
+            mCrimeSolvedImage = (ImageView) itemView.findViewById(R.id.crime_solved);
+
             itemView.setOnClickListener(this);
         } // define CrimeHolder's own constructor
 
         @Override
         public void onClick(View view) {
-            Toast.makeText(getActivity(),
-                    mCrime.getTitle() + "Clicked",
-                    Toast.LENGTH_SHORT).show();
+            Intent intent = new CrimeActivity().newIntent(getActivity(), mCrime.getId());
+            startActivity(intent);
         }
     }
 
