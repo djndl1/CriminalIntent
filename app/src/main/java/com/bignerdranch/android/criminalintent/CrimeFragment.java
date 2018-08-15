@@ -33,6 +33,7 @@ public class CrimeFragment extends Fragment {
         mCrime = new Crime();
     }
 
+    // Wiring up views and  have the fragment instantiate its user interface view
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

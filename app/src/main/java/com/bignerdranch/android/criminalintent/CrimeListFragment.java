@@ -7,6 +7,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -41,10 +45,35 @@ public class CrimeListFragment extends Fragment {
 
     }
 
-    private class CrimeHolder extends RecyclerView.ViewHolder {
+    private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        private TextView mCrimeTitleText;
+        private TextView mCrimeDateText;
+
+        private Crime mCrime;
+
+
+        public void Bind(Crime crime) {
+            mCrime = crime;
+
+            mCrimeTitleText.setText(mCrime.getTitle());
+            mCrimeDateText.setText(mCrime.getDate().toString());
+        }
+
         public CrimeHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.list_item_crime, parent, false));
+
+            mCrimeTitleText = (TextView) itemView.findViewById(R.id.crime_title);
+            mCrimeDateText = (TextView) itemView.findViewById(R.id.crime_date);
+            itemView.setOnClickListener(this);
         } // define CrimeHolder's own constructor
+
+        @Override
+        public void onClick(View view) {
+            Toast.makeText(getActivity(),
+                    mCrime.getTitle() + "Clicked",
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
@@ -63,7 +92,7 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(CrimeHolder holder, int position) {
-
+            holder.Bind(mCrimes.get(position));
         }
 
         @Override
