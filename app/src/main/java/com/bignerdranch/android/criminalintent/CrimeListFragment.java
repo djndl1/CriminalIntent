@@ -60,6 +60,15 @@ public class CrimeListFragment extends Fragment {
 
         private Crime mCrime;
 
+        public CrimeHolder(LayoutInflater inflater, ViewGroup parent) {
+            super(inflater.inflate(R.layout.list_item_crime, parent, false)); // public constructor of RecyclerView.ViewHolder
+
+            mCrimeTitleText = (TextView) itemView.findViewById(R.id.crime_title);
+            mCrimeDateText = (TextView) itemView.findViewById(R.id.crime_date);
+            mCrimeSolvedImage = (ImageView) itemView.findViewById(R.id.crime_solved); // why itemVie?
+
+            itemView.setOnClickListener(this);
+        } // define CrimeHolder's own constructor
 
         public void Bind(Crime crime) {
             mCrime = crime;
@@ -68,16 +77,6 @@ public class CrimeListFragment extends Fragment {
             mCrimeDateText.setText(mCrime.getDate().toString());
             mCrimeSolvedImage.setVisibility(mCrime.isSolved() ? View.VISIBLE : View.GONE);
         }
-
-        public CrimeHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.list_item_crime, parent, false));
-
-            mCrimeTitleText = (TextView) itemView.findViewById(R.id.crime_title);
-            mCrimeDateText = (TextView) itemView.findViewById(R.id.crime_date);
-            mCrimeSolvedImage = (ImageView) itemView.findViewById(R.id.crime_solved);
-
-            itemView.setOnClickListener(this);
-        } // define CrimeHolder's own constructor
 
         @Override
         public void onClick(View view) {

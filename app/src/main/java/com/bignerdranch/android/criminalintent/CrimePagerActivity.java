@@ -21,7 +21,7 @@ public class CrimePagerActivity extends AppCompatActivity {
     private ViewPager mCrimePager;
     private List<Crime> mCrimes;
 
-    public static final String EXTRA_CRIME_ID = "com.bignerdranch.android.criminalIntent.crime_id";
+    public static final String EXTRA_CRIME_ID = "com.bignerdranch.android.criminalintent.crime_id";
 
         public Intent newIntent(Context PackageContext, UUID crime_id) {
         Intent intent = new Intent(PackageContext, CrimePagerActivity.class);
@@ -38,9 +38,9 @@ public class CrimePagerActivity extends AppCompatActivity {
         mCrimePager = (ViewPager) findViewById(R.id.crime_view_pager);
 
         mCrimes = CrimeLab.get(this).getCrimes();
-        UUID crimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CRIME_ID);
 
         FragmentManager fm = getSupportFragmentManager();
+
         mCrimePager.setAdapter(new FragmentStatePagerAdapter(fm) {
             @Override
             public Fragment getItem(int position) {
@@ -54,6 +54,7 @@ public class CrimePagerActivity extends AppCompatActivity {
             }
         });
 
+        UUID crimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CRIME_ID);
         for (int i=0; i < mCrimes.size(); i++) {
             if (mCrimes.get(i).getId().equals(crimeId))
             {
@@ -61,5 +62,6 @@ public class CrimePagerActivity extends AppCompatActivity {
                 break;
             }
         }
+
     }
 }

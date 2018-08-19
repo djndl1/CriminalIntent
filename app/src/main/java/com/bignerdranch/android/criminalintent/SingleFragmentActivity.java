@@ -18,7 +18,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fragment);
 
-        FragmentManager fm = getSupportFragmentManager(); // inherited by AppCompatActivity
+        FragmentManager fm = getSupportFragmentManager(); // inherited from AppCompatActivity
         Fragment frag = fm.findFragmentById(R.id.fragment_container);
         //null returned if not in the list,
         // otherwise the fragment corresponding to the id// is returned
@@ -26,7 +26,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
         //if the fragment is not in the list, i.d. , not created, then add one to the list of FragmentManager
         if (frag == null) {
             frag = createFragment();
-            fm.beginTransaction().add(R.id.fragment_container, frag).commit();
+            fm.beginTransaction().add(R.id.fragment_container, frag).commit(); // fluent method
         }
     }
 }
