@@ -2,6 +2,7 @@ package com.bignerdranch.android.criminalintent;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment; // encouraged
+import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -23,6 +24,8 @@ import static android.widget.CompoundButton.*;
 public class CrimeFragment extends Fragment {
 
     private static final String ARG_CRIME_ID = "crime_id";
+    private static final String DIALOG_DATE = "DialogDate";
+    private static final int REQUEST_DATE = 0;
     private Crime mCrime;
 
     private EditText mTitleText;
@@ -76,7 +79,16 @@ public class CrimeFragment extends Fragment {
 
         mCrimeDate = (Button) v.findViewById(R.id.crime_date);
         mCrimeDate.setText(mCrime.getDate().toString());
-        mCrimeDate.setEnabled(false);
+        mCrimeDate.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager manager = getFragmentManager();
+                DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
+                dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
+                dialog.show(manager, DIALOG_DATE);
+
+            }
+        });
 
         mSolved = (CheckBox) v.findViewById(R.id.crime_solved);
         mSolved.setChecked(mCrime.isSolved());
