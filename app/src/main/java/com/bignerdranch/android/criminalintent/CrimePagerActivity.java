@@ -23,7 +23,7 @@ public class CrimePagerActivity extends AppCompatActivity {
 
     public static final String EXTRA_CRIME_ID = "com.bignerdranch.android.criminalintent.crime_id";
 
-        public Intent newIntent(Context PackageContext, UUID crime_id) {
+        public static Intent newIntent(Context PackageContext, UUID crime_id) {
         Intent intent = new Intent(PackageContext, CrimePagerActivity.class);
         intent.putExtra(EXTRA_CRIME_ID, crime_id);
 

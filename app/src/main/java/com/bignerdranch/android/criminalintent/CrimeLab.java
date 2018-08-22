@@ -1,10 +1,17 @@
 package com.bignerdranch.android.criminalintent;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.bignerdranch.android.criminalintent.database.CrimeBaseHelper;
+import com.bignerdranch.android.criminalintent.database.CrimeDbSchema;
+import com.bignerdranch.android.criminalintent.database.CrimeDbSchema.CrimeTable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 
 /**
  * Created by djn on 18-8-14.
@@ -13,7 +20,8 @@ import java.util.UUID;
 public class CrimeLab {
     private static CrimeLab sCrimeLab; // unique instance
 
-    private List<Crime> mCrimes;
+    private Context mContext;
+    private SQLiteDatabase mDatabase;
 
     // The only instance of the class should be got only through get() method
     public static CrimeLab get(Context context) {
@@ -24,27 +32,42 @@ public class CrimeLab {
     }
 
     private CrimeLab(Context context) {
-        mCrimes = new ArrayList<>();
+        mContext = context.getApplicationContext();
+        mDatabase = new CrimeBaseHelper(mContext)
+                .getWritableDatabase(); // onCreate() if not created, onUpdate() if already created
 
-        for (int i=1; i<=100; i++) {
-            Crime crime = new Crime();
-            crime.setTitle("Set Title #" + i);
-            crime.setSolved(i % 2 == 0);
-            mCrimes.add(crime);
-        }
     } // instance constructed only inside the class
 
+
     public List<Crime> getCrimes(){
-        return mCrimes;
+        return new ArrayList<>();
     }
 
     public Crime getCrime(UUID id){
-        for (Crime c : mCrimes) {
-            if (c.getId().equals(id))
-            {
-                return c;
-            }
-        }
         return null;
+    }
+
+    public void addCrime(Crime c) {
+        ContentValues values = getContentValues(c);
+
+        mDatabase.insert(CrimeTable.NAME, null, values);
+    }
+
+    private static ContentValues getContentValues(Crime crime) {
+        ContentValues values = new ContentValues();
+        values.put(CrimeTable.Cols.UUID, crime.getId().toString());
+        values.put(CrimeTable.Cols.TITLE, crime.getTitle());
+        values.put(CrimeTable.Cols.DATE, crime.getDate().getTime());
+        values.put(CrimeTable.Cols.SOLVED, crime.isSolved() ? 1 : 0);
+
+        return values;
+    }
+
+    public void updateCrime(Crime crime) {
+        String uuidString = crime.getId().toString();
+        ContentValues values = getContentValues(crime);
+
+        mDatabase.update(CrimeTable.NAME, values, CrimeTable.Cols.UUID + " = ?",
+                new String[] { uuidString });8
     }
 }
