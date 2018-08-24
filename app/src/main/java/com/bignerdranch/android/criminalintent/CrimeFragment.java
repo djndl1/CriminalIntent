@@ -3,6 +3,7 @@ package com.bignerdranch.android.criminalintent;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment; // encouraged
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
@@ -30,11 +31,15 @@ public class CrimeFragment extends Fragment {
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final int REQUEST_DATE = 0;
+    private static final int REQUEST_CONTACT = 1;
+
     private Crime mCrime;
 
     private EditText mTitleText;
     private Button mCrimeDate;
     private CheckBox mSolved;
+    private Button mReportButton;
+    private Button mSuspectButton;
 
     public static CrimeFragment newInstance(UUID crime_id) {
         Bundle args = new Bundle();
@@ -111,6 +116,38 @@ public class CrimeFragment extends Fragment {
                     mCrime.setSolved(true);
             }
         });
+
+        //mReportButton is for generating an intent to send the crime report
+        mReportButton = (Button) v.findViewById(R.id.crime_report);
+        mReportButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_SEND);//set intent action
+                i.setType("text/plain");//set MIME type
+                i.putExtra(Intent.EXTRA_TEXT, getCrimeReport());//fill in text to be sent
+                i.putExtra(Intent.EXTRA_SUBJECT,
+                        getString(R.string.crime_report_subject));// fill in a subject
+                i = Intent.createChooser(i, getString(R.string.send_report));// forces a chooser
+                startActivity(i);
+            }
+        });
+
+        //mSuspectButton is for choosing a person as the suspect of the crime
+        final Intent PickContact = new Intent(Intent.ACTION_PICK,
+                            ContactsContract.Contacts.CONTENT_URI);
+        //The suspect may be picked more than once, so PickContact is placed outside the listener.
+
+        mSuspectButton = (Button) v.findViewById(R.id.crime_suspect);
+        mSuspectButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(PickContact, REQUEST_CONTACT);
+            }
+        });
+
+        if (mCrime.getSuspect() != null) {
+            mSuspectButton.setText(mCrime.getSuspect());
+        }
 
         return v;
     }
