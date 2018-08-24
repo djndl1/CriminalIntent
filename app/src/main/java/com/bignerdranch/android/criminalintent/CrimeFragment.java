@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment; // encouraged
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,6 +55,12 @@ public class CrimeFragment extends Fragment {
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        CrimeLab.get(getActivity()).updateCrime(mCrime);
+    }
     // Wiring up views and  have the fragment instantiate its user interface view
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -122,5 +129,37 @@ public class CrimeFragment extends Fragment {
 
     private void updateDate() {
         mCrimeDate.setText(mCrime.getDate().toString());
+    }
+
+    /*
+    Generates a crime report containing the information of whether it has been solved,
+    its date, suspect and crime title.
+     */
+    private String getCrimeReport() {
+        //Check if the crime is solved
+        String solvedString = null;
+        if (mCrime.isSolved()) {
+            solvedString = getString(R.string.crime_report_solved);
+        } else {
+            solvedString = getString(R.string.crime_report_unsolved);
+        }
+
+        //Determine the date
+        String dateFormat = "EEE, MMM dd";
+        String dateString = DateFormat.format(dateFormat, mCrime.getDate()).toString();
+        //Utility class for producing strings with formatted date/time.
+
+        //Check if there's a suspect, if there is, add it.
+        String suspect = mCrime.getSuspect();
+        if (suspect == null) {
+            suspect = getString(R.string.crime_report_no_suspect);
+        } else {
+            suspect = getString(R.string.crime_report_suspect, suspect);
+        }
+
+        //fill all information needed in the report
+        String report = getString(R.string.crime_report, mCrime.getTitle(), dateString, solvedString, suspect);
+
+        return report;
     }
 }

@@ -124,11 +124,13 @@ public class CrimeListFragment extends Fragment {
             mCrimeAdapter = new CrimeAdapter(crimes);
             mCrimeRecyclerView.setAdapter(mCrimeAdapter);
         } else {
+            mCrimeAdapter.setCrimes(crimes);
             mCrimeAdapter.notifyDataSetChanged();
         }
 
         updateSubtitle();
     }
+
 
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -186,5 +188,10 @@ public class CrimeListFragment extends Fragment {
         public int getItemCount() {
             return mCrimes.size();
         }
+
+        public void setCrimes(List<Crime> crimes) {
+            mCrimes = crimes;
+    }
+
     }
 }
