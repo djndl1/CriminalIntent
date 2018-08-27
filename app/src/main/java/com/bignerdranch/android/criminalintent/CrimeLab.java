@@ -10,14 +10,11 @@ import com.bignerdranch.android.criminalintent.database.CrimeCursorWrapper;
 import com.bignerdranch.android.criminalintent.database.CrimeDbSchema;
 import com.bignerdranch.android.criminalintent.database.CrimeDbSchema.CrimeTable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
-/**
- * Created by djn on 18-8-14.
- */
 
 public class CrimeLab {
     private static CrimeLab sCrimeLab; // unique instance
@@ -25,7 +22,11 @@ public class CrimeLab {
     private Context mContext;
     private SQLiteDatabase mDatabase;
 
-    // The only instance of the class should be got only through get() method
+    /** The only instance of the class should be got only through get() method
+     *
+     * @param context
+     * @return
+     */
     public static CrimeLab get(Context context) {
         if (sCrimeLab == null)
             sCrimeLab = new CrimeLab(context);
@@ -40,8 +41,10 @@ public class CrimeLab {
 
     } // instance constructed only inside the class
 
-    /* getting a list of Crimes by querying all rows of CrimeTable
-       using a CursorWrapper moving down each row to add it to the list
+    /** Getting a list of Crimes by querying all rows of CrimeTable
+     *  using a CursorWrapper moving down each row to add it to the list
+     *
+     * @return
      */
     public List<Crime> getCrimes(){
 
@@ -63,7 +66,11 @@ public class CrimeLab {
         return crimes;
         }
 
-    /* getting a Crime by its UUID using a CursorWrapper obtained by querying */
+    /** getting a Crime by its UUID using a CursorWrapper obtained by querying
+     *
+     * @param id
+     * @return
+     */
     public Crime getCrime(UUID id){
         // Query by UUID
         CrimeCursorWrapper curWrap = queryCrimes(CrimeTable.Cols.UUID + " = ?",
@@ -83,8 +90,9 @@ public class CrimeLab {
 
     }
 
-    /*
-        adding a Crime to the database using a ContentValues
+    /** adding a Crime to the database using a ContentValues
+     *
+     * @param c
      */
     public void addCrime(Crime c) {
         ContentValues values = getContentValues(c);
@@ -92,7 +100,11 @@ public class CrimeLab {
         mDatabase.insert(CrimeTable.NAME, null, values);
     }
 
-    // returning a ContentValues to insert into the database a record
+    /** returning a ContentValues to insert into the database a record
+     *
+     * @param crime
+     * @return
+     */
     private static ContentValues getContentValues(Crime crime) {
         ContentValues values = new ContentValues();
         values.put(CrimeTable.Cols.UUID, crime.getId().toString());
@@ -104,7 +116,10 @@ public class CrimeLab {
         return values;
     }
 
-    // updating a row in the database
+    /** updating a row in the database
+     *
+     * @param crime
+     */
     public void updateCrime(Crime crime) {
         String uuidString = crime.getId().toString();
         ContentValues values = getContentValues(crime);
@@ -113,10 +128,13 @@ public class CrimeLab {
                 new String[] { uuidString });
     }
 
-    /*
-        Returning a Cursor (CursorWrapper is an implementation of Cursor)
-       for query of certain conditions specified by whereClause and whereArgs
-    */
+    /** Returning a Cursor (CursorWrapper is an implementation of Cursor)
+     * for query of certain conditions specified by whereClause and whereArgs
+     *
+     * @param whereClause
+     * @param whereArgs
+     * @return
+     */
     private CrimeCursorWrapper queryCrimes(String whereClause, String[] whereArgs) {
         Cursor cursor = mDatabase.query(
                 CrimeTable.NAME,
@@ -130,4 +148,11 @@ public class CrimeLab {
         return new CrimeCursorWrapper(cursor);
     }
 
+    /*
+
+     */
+    public File getPhotoFile(Crime crime) {
+        File filesDir = mContext.getFilesDir();//returns the absolute path of the application files
+        return new File(filesDir, crime.getPhotoFilename());
+    }
 }
