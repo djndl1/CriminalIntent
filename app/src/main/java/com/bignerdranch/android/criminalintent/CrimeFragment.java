@@ -68,6 +68,9 @@ public class CrimeFragment extends Fragment {
         return crimeFrag;
     }
 
+    /**
+     * This interface is defined for the hosting activity to implement. It updates the crime list.
+     */
     public interface Callbacks {
         void onCrimeUpdated(Crime crime);
     }
@@ -118,7 +121,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mCrime.setTitle(s.toString());
-                updateCrime();
+                updateCrime(); //whenever the title is changed, the database and the list should be updated.
             }
 
             @Override
@@ -149,7 +152,7 @@ public class CrimeFragment extends Fragment {
                     mCrime.setSolved(false);
                 else
                     mCrime.setSolved(true);
-                updateCrime();
+                updateCrime(); //whenever the crime is modified, the list should be updated.
             }
         });
 
@@ -241,7 +244,7 @@ public class CrimeFragment extends Fragment {
         if (requestcode == REQUEST_DATE) {
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setDate(date);
-            updateCrime();
+            updateCrime();// whenever the date is changed, the database and the list should be updated.
             updateDate();
         } else if (requestcode == REQUEST_CONTACT && data != null) {
             Uri contactUri = data.getData(); //get a URI from the intent
@@ -258,7 +261,7 @@ public class CrimeFragment extends Fragment {
                 c.moveToNext();
                 String suspect = c.getString(0); // return the first column
                 mCrime.setSuspect(suspect);
-                updateCrime();
+                updateCrime(); // whenever the suspect is changed, the database and the list should be updated
                 mSuspectButton.setText(suspect);
                 } finally {
                 c.close();
@@ -270,7 +273,7 @@ public class CrimeFragment extends Fragment {
 
             getActivity().revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 
-            updateCrime();
+            updateCrime();// whenever the photo is changed, the database should be updated.
             updatePhotoView();
         }
     }
@@ -320,6 +323,10 @@ public class CrimeFragment extends Fragment {
         }
     }
 
+    /**
+     * update the currently modified crime in the database, and then update the crime list by using
+     * a callback to reload the crime list of the recyclerview.
+     */
     private void updateCrime() {
         CrimeLab.get(getActivity()).updateCrime(mCrime);
         mCallbacks.onCrimeUpdated(mCrime);

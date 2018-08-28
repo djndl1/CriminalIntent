@@ -31,10 +31,19 @@ public class CrimeListFragment extends Fragment {
     private boolean mSubtitleVisible;
     private Callbacks mCallbacks;
 
+    /**
+     * An callback interface for its hosting activity to implement. This interface will decide
+     * which layout to use. As long as this interface is implemented, this fragment is not affected.
+     */
     public interface Callbacks {
         void onCrimeSelected(Crime crime);
     }
 
+    /**
+     * Initialize the Callbacks variable mCallbacks at the attachment of CrimeListFragment. The hosting
+     * activity must implement the Callbacks interface since it performs an unchecked cast.
+     * @param context The hosting activity
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -65,6 +74,11 @@ public class CrimeListFragment extends Fragment {
         return v;
     }
 
+    /**
+     *
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected (MenuItem item)
     {
@@ -72,8 +86,8 @@ public class CrimeListFragment extends Fragment {
             case R.id.new_crime:
                 Crime crime = new Crime();
                 CrimeLab.get(getActivity()).addCrime(crime);
-                updateUI();
-                mCallbacks.onCrimeSelected(crime);
+                updateUI(); //when a new crime is created, the list should be updated.
+                mCallbacks.onCrimeSelected(crime); //Display the detail fragment using the callback.
                 return true;
 
             case R.id.show_subtitle:
@@ -117,6 +131,9 @@ public class CrimeListFragment extends Fragment {
         outState.putBoolean(SAVED_SUBTITLE_VISIBLE, mSubtitleVisible);
     }
 
+    /**
+     * Afterward the activity cannot be accesses or continue to exist.
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -181,6 +198,12 @@ public class CrimeListFragment extends Fragment {
             mCrimeSolvedImage.setVisibility(mCrime.isSolved() ? View.VISIBLE : View.GONE);
         }
 
+        /**
+         * When A CrimeHolder is clicked, the corresponding Crime object should be displayed, either
+         * in a panel (on a tablet) or in another activity (on a phone). Thus a callback defined by
+         * this fragment, implemented by the hosting activity should be called to show the crime detail.
+         * @param view
+         */
         @Override
         public void onClick(View view) {
             mCallbacks.onCrimeSelected(mCrime);

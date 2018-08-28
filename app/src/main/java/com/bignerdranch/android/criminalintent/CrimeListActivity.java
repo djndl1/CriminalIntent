@@ -16,11 +16,23 @@ public class CrimeListActivity extends SingleFragmentActivity
         return new CrimeListFragment();
     }
 
+    /**
+     * Use aliases to choose layouts for different devices
+      * @return a single-fragment layout for phones, a double-panel layout for tablets
+     */
     @Override
     protected int getLayoutResId() {
         return R.layout.activity_masterdetail;
     }
 
+    /**
+     * The is the implementation of CrimeListFragment.Callbacks. It checks whether the hosting
+     * activity has the detail_fragment_container, that is, whether the device is a tablet or
+     * a phone, to determine whether to start a new CrimePagerActivity to host the CrimeFragment
+     * or to put a CrimeFragment in detail_fragment_container.
+     * @param crime the Crime object to display and modify in the CrimeFragment
+     */
+    @Override
     public void onCrimeSelected(Crime crime) {
         if (findViewById(R.id.detail_fragment_container) == null) {
             Intent intent = CrimePagerActivity.newIntent(this, crime.getId());
@@ -33,10 +45,17 @@ public class CrimeListActivity extends SingleFragmentActivity
         }
     }
 
+    /**
+     * The implementation of CrimeFragment.Callbacks. It is designed to update the crime list. It
+     * actually calls the updateUI() method of CrimeListFragment to reload all crimes to update the
+     * list and the subtitle.
+     * @param crime the Crime object to be updated
+     */
+    @Override
     public void onCrimeUpdated(Crime crime) {
         CrimeListFragment listFrag = (CrimeListFragment) getSupportFragmentManager()
                                                     .findFragmentById(R.id.fragment_container);
-        listFrag.updateUI();
+        listFrag.updateUI(); // update the crime list
     }
 
 }
