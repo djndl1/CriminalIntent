@@ -1,6 +1,7 @@
 package com.bignerdranch.android.criminalintent;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -27,7 +28,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import java.io.File;
-import java.security.interfaces.RSAPrivateCrtKey;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -48,6 +48,7 @@ public class CrimeFragment extends Fragment {
 
     private Crime mCrime;
     private File mPhotoFile;
+    private Callbacks mCallbacks;
 
     private EditText mTitleText;
     private Button mCrimeDate;
@@ -65,6 +66,22 @@ public class CrimeFragment extends Fragment {
         crimeFrag.setArguments(args);
 
         return crimeFrag;
+    }
+
+    public interface Callbacks {
+        void onCrimeUpdated(Crime crime);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallbacks = (Callbacks) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
     }
 
     @Override
@@ -101,6 +118,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mCrime.setTitle(s.toString());
+                updateCrime();
             }
 
             @Override
@@ -131,6 +149,7 @@ public class CrimeFragment extends Fragment {
                     mCrime.setSolved(false);
                 else
                     mCrime.setSolved(true);
+                updateCrime();
             }
         });
 
@@ -222,6 +241,7 @@ public class CrimeFragment extends Fragment {
         if (requestcode == REQUEST_DATE) {
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setDate(date);
+            updateCrime();
             updateDate();
         } else if (requestcode == REQUEST_CONTACT && data != null) {
             Uri contactUri = data.getData(); //get a URI from the intent
@@ -238,6 +258,7 @@ public class CrimeFragment extends Fragment {
                 c.moveToNext();
                 String suspect = c.getString(0); // return the first column
                 mCrime.setSuspect(suspect);
+                updateCrime();
                 mSuspectButton.setText(suspect);
                 } finally {
                 c.close();
@@ -249,6 +270,7 @@ public class CrimeFragment extends Fragment {
 
             getActivity().revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 
+            updateCrime();
             updatePhotoView();
         }
     }
@@ -296,5 +318,10 @@ public class CrimeFragment extends Fragment {
             Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
             mPhotoView.setImageBitmap(bitmap);
         }
+    }
+
+    private void updateCrime() {
+        CrimeLab.get(getActivity()).updateCrime(mCrime);
+        mCallbacks.onCrimeUpdated(mCrime);
     }
 }
